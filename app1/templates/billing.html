@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" ></script>
+    <title>Billing</title>
+  </head>
+  <body>
+    <div class="container">
+        <div class="row mt-3">
+            <form class="mx-auto p-2">
+                <div class="form-row">
+                  <div class="form-group col-md-5">
+                    <label for="">Medicine Name</label>
+                    <select id="med" class="form-control" name="medicine">
+                        <option disabled selected>-----select-----</option>
+                        {% for i in medicine %}
+                        <option value="{{ i.id }}">{{ i.medicine_name }}</option>
+                        {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-5">
+                    <label for="inputPassword4">Quantity</label>
+                    <input type="number" class="form-control" id="qty" name="qty">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <button class="btn btn-success mt-4" type="button" id="add">ADD</button>
+                  </div>
+                </div>
+            </form>
+        </div>
+          <div id="content">
+              <div class="row">
+                  <div class="col-lg-12">
+                      <h3 class="text-center">ABC Medicals</h3>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-lg-12 table-responsive">
+                      <table class="table text-center">
+                          <thead>
+                            <tr>
+                              <th scope="col">Medicine Name</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Price <small class="text-muted">per qty</small></th>
+                              <th scope="col">CGST <small class="text-muted">5%</small></th>
+                              <th scope="col">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody id="bill">
+                          </tbody>
+                        </table>
+                  </div>
+              </div>
+          </div>
+          <div class="row mt-5">
+              <div class="col-lg-3 mx-auto">
+                <button type="button" class="btn btn-success" onclick="generatepdf()">DOWNLOAD</button>
+                <a href="{% url 'home' %}"><button type="button" class="btn btn-danger">HOME</button></a>
+              </div>
+          </div>
+    </div>
+
+    <script>
+         $(document).ready(()=>{
+            $("#add").click(()=>{
+                $.ajax({
+                    url:"/medbilling/",
+                    type:'post',
+                    data:{
+
+                        'medicine':$('#med').val(),
+                        'qty':$('#qty').val(),
+                        
+                    },
+                    success:function(response){
+                        $('#bill').append('<tr><td>' + response.med.medicine_name + '</td><td>' + response.qty + '</td><td>' + response.med.selling_price + '</td><td>'+ response.cgst +'</td><td>'+ response.total +'</td></tr>');
+                        
+                    }
+                })  
+            })
+        })
+
+        function generatepdf(){
+            const element = document.getElementById(content)
+
+            html2pdf()
+            .from(element)
+            .save()
+        }
+
+    </script>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
